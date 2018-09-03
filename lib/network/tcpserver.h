@@ -47,6 +47,8 @@ public:
 
     TcpServer(const TcpServer &) = delete;
 
+    void setProxy(int proxyType, std::string proxyServerAddress, uint16_t port);
+
 signals:
     void bytesRead(quint64);
     void bytesSend(quint64);
@@ -62,6 +64,12 @@ private:
     const bool autoBan;
     const Address serverAddress;
     const int timeout;
+
+    int m_proxyType;
+    std::string m_proxyServerAddress;
+    uint16_t m_proxyPort;
+    std::string m_proxyUsername;
+    std::string m_proxyPassword;
 
     std::list<std::shared_ptr<TcpRelay> > conList;
 };

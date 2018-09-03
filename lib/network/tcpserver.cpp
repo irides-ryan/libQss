@@ -1,3 +1,5 @@
+#include <utility>
+
 /*
  * tcpserver.cpp
  *
@@ -71,6 +73,7 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
                                                serverAddress,
                                                method,
                                                password);
+        con->setProxy(m_proxyType, m_proxyServerAddress, m_proxyPort);
     } else {
         con = std::make_shared<TcpRelayServer>(localSocket.release(),
                                                timeout * 1000,
@@ -87,6 +90,12 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
     connect(con.get(), &TcpRelay::finished, this, [con, this]() {
         conList.remove(con);
     });
+}
+
+void TcpServer::setProxy(int proxyType, std::string proxyServerAddress, uint16_t proxyPort) {
+    m_proxyType = proxyType;
+    m_proxyServerAddress = std::move(proxyServerAddress);
+    m_proxyPort = proxyPort;
 }
 
 }  // namespace QSS

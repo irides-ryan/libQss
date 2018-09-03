@@ -76,7 +76,9 @@ Controller::Controller(Profile _profile,
                                   isLocal,
                                   autoBan,
                                   serverAddress);
-
+    if (profile.proxy()) {
+        tcpServer->setProxy(profile.proxyType(), profile.proxyServerAddress(), profile.proxyPort());
+    }
     //FD_SETSIZE which is the maximum value on *nix platforms. (1024 by default)
     tcpServer->setMaxPendingConnections(FD_SETSIZE);
     udpRelay = std::make_unique<QSS::UdpRelay>(profile.method(),

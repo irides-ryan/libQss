@@ -74,6 +74,19 @@ TcpRelay::TcpRelay(QTcpSocket *localSocket,
     remote->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
 }
 
+void TcpRelay::setProxy(int proxyType, std::string proxyServerAddress, uint16_t port) {
+    if (static_cast<TcpRelay::PROXY>(proxyType) == TcpRelay::Http) {
+        proxy.setType(QNetworkProxy::HttpProxy);
+    } else if (static_cast<TcpRelay::PROXY>(proxyType) == TcpRelay::Socks5) {
+        proxy.setType(QNetworkProxy::Socks5Proxy);
+    } else {
+        return;
+    }
+    proxy.setHostName(proxyServerAddress.c_str());
+    proxy.setPort(port);
+    remote->setProxy(proxy);
+}
+
 void TcpRelay::close()
 {
     if (stage == DESTROYED) {

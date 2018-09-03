@@ -27,6 +27,7 @@
 #include <QTcpSocket>
 #include <QTimer>
 #include <QTime>
+#include <QtNetwork/QNetworkProxy>
 #include "types/address.h"
 #include "crypto/encryptor.h"
 
@@ -48,6 +49,10 @@ public:
     TcpRelay(const TcpRelay &) = delete;
 
     enum STAGE { INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED };
+
+    enum PROXY { None, Http, Socks5 };
+
+    void setProxy(int proxyType, std::string proxyServerAddress, uint16_t port);
 
 signals:
     /*
@@ -75,6 +80,7 @@ protected:
     std::unique_ptr<QTcpSocket> remote;
     std::unique_ptr<QTimer> timer;
     QTime startTime;
+    QNetworkProxy proxy;
 
     bool writeToRemote(const char *data, size_t length);
 

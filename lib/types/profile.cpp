@@ -120,6 +120,30 @@ bool Profile::hasPlugin() const
     return !d_private->pluginExec.empty();
 }
 
+bool Profile::proxy() const {
+    return d_proxy;
+}
+
+int Profile::proxyType() const {
+    return d_proxyType;
+}
+
+const std::string Profile::proxyServerAddress() const {
+    return d_proxyServerAddress;
+}
+
+uint16_t Profile::proxyPort() const {
+    return d_proxyPort;
+}
+
+const std::string Profile::proxyUsername() const {
+    return d_proxyUsername;
+}
+
+const std::string Profile::proxyPassword() const {
+    return d_proxyPassword;
+}
+
 void Profile::setName(const std::string& name)
 {
     d_name = name;
@@ -163,6 +187,30 @@ void Profile::setTimeout(int t)
 void Profile::setHttpProxy(bool e)
 {
     d_private->httpProxy = e;
+}
+
+void Profile::setProxy(bool proxy) {
+    d_proxy = proxy;
+}
+
+void Profile::setProxyType(int proxyType) {
+    d_proxyType = proxyType;
+}
+
+void Profile::setProxyServerAddress(const std::string address) {
+    d_proxyServerAddress = address;
+}
+
+void Profile::setProxyPort(uint16_t port) {
+    d_proxyPort = port;
+}
+
+void Profile::setProxyUsername(const std::string username) {
+    d_proxyUsername = username;
+}
+
+void Profile::setProxyPassword(const std::string password) {
+    d_proxyPassword = password;
 }
 
 void Profile::enableDebug()

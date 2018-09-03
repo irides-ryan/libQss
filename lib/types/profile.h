@@ -52,6 +52,12 @@ public:
     bool httpProxy() const;
     bool debug() const;
     bool hasPlugin() const;
+    bool proxy() const;
+    int proxyType() const;
+    const std::string proxyServerAddress() const;
+    uint16_t proxyPort() const;
+    const std::string proxyUsername() const;
+    const std::string proxyPassword() const;
 
     /**
      * @brief isValid Whether this profile has essential information.
@@ -73,6 +79,12 @@ public:
     void setLocalPort(uint16_t);
     void setTimeout(int);
     void setHttpProxy(bool);
+    void setProxy(bool);
+    void setProxyType(int);
+    void setProxyServerAddress(const std::string address);
+    void setProxyPort(uint16_t port);
+    void setProxyUsername(const std::string username);
+    void setProxyPassword(const std::string password);
     void enableDebug();
     void disableDebug();
     void setPlugin(std::string exec, std::string opts = std::string());
@@ -96,6 +108,14 @@ private:
     uint16_t d_serverPort;
     uint16_t d_localPort;
     int d_timeout;
+
+    // Forward Proxy Settings
+    bool d_proxy;
+    int d_proxyType;
+    std::string d_proxyServerAddress;
+    uint16_t d_proxyPort;
+    std::string d_proxyUsername;
+    std::string d_proxyPassword;
 };
 
 }
