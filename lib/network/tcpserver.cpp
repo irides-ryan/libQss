@@ -92,9 +92,9 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
     });
 }
 
-void TcpServer::setProxy(int proxyType, std::string proxyServerAddress, uint16_t proxyPort) {
+void TcpServer::setProxy(int proxyType, const std::string& proxyServerAddress, const uint16_t& proxyPort) {
     m_proxyType = proxyType;
-    m_proxyServerAddress = std::move(proxyServerAddress);
+    m_proxyServerAddress = proxyServerAddress;
     m_proxyPort = proxyPort;
 }
 

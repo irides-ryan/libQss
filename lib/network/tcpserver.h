@@ -47,7 +47,7 @@ public:
 
     TcpServer(const TcpServer &) = delete;
 
-    void setProxy(int proxyType, std::string proxyServerAddress, uint16_t port);
+    void setProxy(int proxyType, const std::string& proxyServerAddress, const uint16_t& port);
 
 signals:
     void bytesRead(quint64);

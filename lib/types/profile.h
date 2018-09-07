@@ -54,10 +54,10 @@ public:
     bool hasPlugin() const;
     bool proxy() const;
     int proxyType() const;
-    const std::string proxyServerAddress() const;
+    const std::string& proxyServerAddress() const;
     uint16_t proxyPort() const;
-    const std::string proxyUsername() const;
-    const std::string proxyPassword() const;
+    const std::string& proxyUsername() const;
+    const std::string& proxyPassword() const;
 
     /**
      * @brief isValid Whether this profile has essential information.
@@ -81,10 +81,10 @@ public:
     void setHttpProxy(bool);
     void setProxy(bool);
     void setProxyType(int);
-    void setProxyServerAddress(const std::string address);
+    void setProxyServerAddress(const std::string& address);
     void setProxyPort(uint16_t port);
-    void setProxyUsername(const std::string username);
-    void setProxyPassword(const std::string password);
+    void setProxyUsername(const std::string& username);
+    void setProxyPassword(const std::string& password);
     void enableDebug();
     void disableDebug();
     void setPlugin(std::string exec, std::string opts = std::string());

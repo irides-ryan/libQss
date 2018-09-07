@@ -77,6 +77,7 @@ Controller::Controller(Profile _profile,
                                   autoBan,
                                   serverAddress);
     if (profile.proxy()) {
+        qInfo() << "Set proxy: " << profile.proxyServerAddress().c_str() << ":" << profile.proxyPort();
         tcpServer->setProxy(profile.proxyType(), profile.proxyServerAddress(), profile.proxyPort());
     }
     //FD_SETSIZE which is the maximum value on *nix platforms. (1024 by default)

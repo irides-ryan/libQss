@@ -29,7 +29,13 @@ Profile::Profile(const Profile &b) :
     d_localAddress(b.d_localAddress),
     d_serverPort(b.d_serverPort),
     d_localPort(b.d_localPort),
-    d_timeout(b.d_timeout)
+    d_timeout(b.d_timeout),
+    d_proxy(b.d_proxy),
+    d_proxyType(b.d_proxyType),
+    d_proxyServerAddress(b.d_proxyServerAddress),
+    d_proxyPort(b.d_proxyPort),
+    d_proxyUsername(b.d_proxyUsername),
+    d_proxyPassword(b.d_proxyPassword)
 {
 }
 
@@ -43,6 +49,12 @@ Profile::Profile(Profile &&b)
     , d_serverPort(std::move(b.d_serverPort))
     , d_localPort(std::move(b.d_localPort))
     , d_timeout(std::move(b.d_timeout))
+    , d_proxy(std::move(b.d_proxy))
+    , d_proxyType(std::move(b.d_proxyType))
+    , d_proxyServerAddress(std::move(b.d_proxyServerAddress))
+    , d_proxyPort(std::move(b.d_proxyPort))
+    , d_proxyUsername(std::move(b.d_proxyUsername))
+    , d_proxyPassword(std::move(b.d_proxyPassword))
 {
 }
 
@@ -128,7 +140,7 @@ int Profile::proxyType() const {
     return d_proxyType;
 }
 
-const std::string Profile::proxyServerAddress() const {
+const std::string& Profile::proxyServerAddress() const {
     return d_proxyServerAddress;
 }
 
@@ -136,11 +148,11 @@ uint16_t Profile::proxyPort() const {
     return d_proxyPort;
 }
 
-const std::string Profile::proxyUsername() const {
+const std::string& Profile::proxyUsername() const {
     return d_proxyUsername;
 }
 
-const std::string Profile::proxyPassword() const {
+const std::string& Profile::proxyPassword() const {
     return d_proxyPassword;
 }
 
@@ -197,7 +209,7 @@ void Profile::setProxyType(int proxyType) {
     d_proxyType = proxyType;
 }
 
-void Profile::setProxyServerAddress(const std::string address) {
+void Profile::setProxyServerAddress(const std::string& address) {
     d_proxyServerAddress = address;
 }
 
@@ -205,11 +217,11 @@ void Profile::setProxyPort(uint16_t port) {
     d_proxyPort = port;
 }
 
-void Profile::setProxyUsername(const std::string username) {
+void Profile::setProxyUsername(const std::string& username) {
     d_proxyUsername = username;
 }
 
-void Profile::setProxyPassword(const std::string password) {
+void Profile::setProxyPassword(const std::string& password) {
     d_proxyPassword = password;
 }
 

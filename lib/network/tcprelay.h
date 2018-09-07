@@ -52,7 +52,7 @@ public:
 
     enum PROXY { None, Http, Socks5 };
 
-    void setProxy(int proxyType, std::string proxyServerAddress, uint16_t port);
+    void setProxy(int proxyType, std::string& proxyServerAddress, uint16_t& port);
 
 signals:
     /*
