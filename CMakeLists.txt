@@ -4,7 +4,7 @@ project(QtShadowsocks
         VERSION 2.1.0
         LANGUAGES CXX)
 
-option(BUILD_SHARED_LIBS "Build ${PROJECT_NAME} as a shared library" ON)
+option(BUILD_SHARED_LIBS "Build ${PROJECT_NAME} as a shared library" OFF)
 
 set(LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib
     CACHE PATH "Installation directory for libraries")
