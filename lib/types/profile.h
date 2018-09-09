@@ -110,12 +110,12 @@ private:
     int d_timeout;
 
     // Forward Proxy Settings
-    bool d_proxy;
-    int d_proxyType;
-    std::string d_proxyServerAddress;
-    uint16_t d_proxyPort;
-    std::string d_proxyUsername;
-    std::string d_proxyPassword;
+    bool d_proxy = false;
+    int d_proxyType = 0;
+    std::string d_proxyServerAddress = "";
+    uint16_t d_proxyPort = 8080;
+    std::string d_proxyUsername = "";
+    std::string d_proxyPassword = "";
 };
 
 }
