@@ -50,7 +50,7 @@ public:
 
     enum STAGE { INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED };
 
-    enum PROXY { None, Http, Socks5 };
+    enum PROXY { Http, Socks5 };
 
     void setProxy(int proxyType, std::string& proxyServerAddress, uint16_t& port);
 
