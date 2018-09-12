@@ -65,11 +65,11 @@ private:
     const Address serverAddress;
     const int timeout;
 
-    int m_proxyType;
-    std::string m_proxyServerAddress;
-    uint16_t m_proxyPort;
-    std::string m_proxyUsername;
-    std::string m_proxyPassword;
+    int m_proxyType = -1;
+    std::string m_proxyServerAddress = "";
+    uint16_t m_proxyPort = 8080;
+    std::string m_proxyUsername = "";
+    std::string m_proxyPassword = "";
 
     std::list<std::shared_ptr<TcpRelay> > conList;
 };
