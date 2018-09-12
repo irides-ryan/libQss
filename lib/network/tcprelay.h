@@ -80,7 +80,7 @@ protected:
     std::unique_ptr<QTcpSocket> remote;
     std::unique_ptr<QTimer> timer;
     QTime startTime;
-    QNetworkProxy proxy;
+    QNetworkProxy proxy = QNetworkProxy(QNetworkProxy::NoProxy);
 
     bool writeToRemote(const char *data, size_t length);
 

@@ -74,16 +74,24 @@ void TcpRelayClient::handleStageAddr(std::string &data)
     local->write(response);
     std::string toWrite = encryptor->encrypt(data);
     dataToWrite += toWrite;
-    serverAddress.lookUp([this](bool success) {
-        if (success) {
-            stage = CONNECTING;
-            startTime = QTime::currentTime();
-            remote->connectToHost(serverAddress.getFirstIP(), serverAddress.getPort());
-        } else {
-            QDebug(QtMsgType::QtDebugMsg).noquote() << "Failed to lookup server address. Closing TCP connection.";
-            close();
-        }
-    });
+
+    if (proxy.type() == QNetworkProxy::HttpProxy || proxy.type() == QNetworkProxy::Socks5Proxy) {
+        // if proxy is set, then the proxy will lookup for dns.
+        stage = CONNECTING;
+        startTime = QTime::currentTime();
+        remote->connectToHost(serverAddress.getAddress().c_str(), serverAddress.getPort());
+    } else {
+        serverAddress.lookUp([this](bool success) {
+            if (success) {
+                stage = CONNECTING;
+                startTime = QTime::currentTime();
+                remote->connectToHost(serverAddress.getFirstIP(), serverAddress.getPort());
+            } else {
+                QDebug(QtMsgType::QtDebugMsg).noquote() << "Failed to lookup server address. Closing TCP connection.";
+                close();
+            }
+        });
+    }
 }
 
 void TcpRelayClient::handleLocalTcpData(std::string &data)
