@@ -1,8 +1,10 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.7)
 
-project(QtShadowsocks
-        VERSION 2.1.0
-        LANGUAGES CXX)
+project(
+    QtShadowsocks
+    VERSION 2.2.0
+    LANGUAGES CXX
+)
 
 option(BUILD_SHARED_LIBS "Build ${PROJECT_NAME} as a shared library" OFF)
 option(USE_CONAN "Use C++ Package Manager Conan" OFF)
