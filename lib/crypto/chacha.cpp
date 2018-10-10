@@ -35,10 +35,10 @@ static inline void chacha_quarter_round(uint32_t &a,
                                         uint32_t &b,
                                         uint32_t &c,
                                         uint32_t &d) {
-    a += b; d ^= a; d = rotate_left(d, 16);
-    c += d; b ^= c; b = rotate_left(b, 12);
-    a += b; d ^= a; d = rotate_left(d, 8);
-    c += d; b ^= c; b = rotate_left(b, 7);
+    a += b; d ^= a; d = rotl<16>(d);
+    c += d; b ^= c; b = rotl<12>(b);
+    a += b; d ^= a; d = rotl<8>(d);
+    c += d; b ^= c; b = rotl<7>(b);
 }
 
 }
