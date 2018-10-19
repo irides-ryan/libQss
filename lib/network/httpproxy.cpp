@@ -37,6 +37,7 @@ bool HttpProxy::httpListen(const QHostAddress &http_addr,
                            uint16_t http_port,
                            uint16_t socks_port)
 {
+    this->socks_port = socks_port;
     upstreamProxy = QNetworkProxy(QNetworkProxy::Socks5Proxy,
                                   "127.0.0.1",
                                   socks_port);
@@ -69,10 +70,25 @@ void HttpProxy::onSocketError(QAbstractSocket::SocketError err)
 
 void HttpProxy::onSocketReadyRead()
 {
-    QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
-    QTcpSocket *proxySocket = nullptr;
+  QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
+  QTcpSocket *proxySocket = nullptr;
+  QByteArray reqData = socket->readAll();
 
-    QByteArray reqData = socket->readAll();
+  if (5 == reqData[0]) {
+    // socks5 connection
+    disconnect(socket, &QTcpSocket::readyRead,
+               this, &HttpProxy::onSocketReadyRead);
+
+    proxySocket = new QTcpSocket(socket);
+    SocketStream *stream = new SocketStream(socket, proxySocket, this);
+    connect(socket, &QTcpSocket::disconnected,
+            stream, &SocketStream::deleteLater);
+    connect(proxySocket, &QTcpSocket::disconnected,
+            stream, &SocketStream::deleteLater);
+    proxySocket->connectToHost("127.0.0.1", socks_port);
+    proxySocket->write(reqData);
+  } else {
+    // http connection
     int pos = reqData.indexOf("\r\n");
     QByteArray reqLine = reqData.left(pos);
     reqData.remove(0, pos + 2);
@@ -138,6 +154,7 @@ void HttpProxy::onSocketReadyRead()
              this,
              &HttpProxy::onSocketError);
     proxySocket->connectToHost(host, port);
+  }
 }
 
 void HttpProxy::onProxySocketConnected()

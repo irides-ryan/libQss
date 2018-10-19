@@ -53,6 +53,7 @@ protected:
 
 private:
     QNetworkProxy upstreamProxy;
+    quint16 socks_port = 0;
 
 private slots:
     void onSocketError(QAbstractSocket::SocketError);
