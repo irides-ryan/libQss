@@ -1,5 +1,5 @@
 /*
- * httpproxy.cpp - the source file of HttpProxy class
+ * mixedproxy.cpp - the source file of MixedProxy class
  *
  * Copyright (C) 2015 Symeon Huang <hzwhuang@gmail.com>
  *
@@ -20,7 +20,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "httpproxy.h"
+#include "mixedproxy.h"
 #include "socketstream.h"
 #include <QDebug>
 #include <QTcpSocket>
@@ -28,12 +28,12 @@
 
 using namespace QSS;
 
-HttpProxy::HttpProxy() : QTcpServer()
+MixedProxy::MixedProxy() : QTcpServer()
 {
     this->setMaxPendingConnections(FD_SETSIZE);
 }
 
-bool HttpProxy::httpListen(const QHostAddress &http_addr,
+bool MixedProxy::httpListen(const QHostAddress &http_addr,
                            uint16_t http_port,
                            uint16_t socks_port)
 {
@@ -44,22 +44,22 @@ bool HttpProxy::httpListen(const QHostAddress &http_addr,
     return this->listen(http_addr, http_port);
 }
 
-void HttpProxy::incomingConnection(qintptr socketDescriptor)
+void MixedProxy::incomingConnection(qintptr socketDescriptor)
 {
     QTcpSocket *socket = new QTcpSocket(this);
     connect(socket, &QTcpSocket::readyRead,
-            this, &HttpProxy::onSocketReadyRead);
+            this, &MixedProxy::onSocketReadyRead);
     connect(socket, &QTcpSocket::disconnected,
             socket, &QTcpSocket::deleteLater);
     connect(socket,
             static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
             (&QTcpSocket::error),
             this,
-            &HttpProxy::onSocketError);
+            &MixedProxy::onSocketError);
     socket->setSocketDescriptor(socketDescriptor);
 }
 
-void HttpProxy::onSocketError(QAbstractSocket::SocketError err)
+void MixedProxy::onSocketError(QAbstractSocket::SocketError err)
 {
     if (err != QAbstractSocket::RemoteHostClosedError) {
         QDebug(QtMsgType::QtWarningMsg) << "HTTP socket error: "
@@ -68,7 +68,7 @@ void HttpProxy::onSocketError(QAbstractSocket::SocketError err)
     sender()->deleteLater();
 }
 
-void HttpProxy::onSocketReadyRead()
+void MixedProxy::onSocketReadyRead()
 {
   QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
   QTcpSocket *proxySocket = nullptr;
@@ -77,7 +77,7 @@ void HttpProxy::onSocketReadyRead()
   if (5 == reqData[0]) {
     // socks5 connection
     disconnect(socket, &QTcpSocket::readyRead,
-               this, &HttpProxy::onSocketReadyRead);
+               this, &MixedProxy::onSocketReadyRead);
 
     proxySocket = new QTcpSocket(socket);
     SocketStream *stream = new SocketStream(socket, proxySocket, this);
@@ -139,12 +139,12 @@ void HttpProxy::onSocketReadyRead()
         proxySocket->setObjectName(key);
         proxySocket->setProperty("reqData", reqData);
         connect (proxySocket, &QTcpSocket::connected,
-                 this, &HttpProxy::onProxySocketConnected);
+                 this, &MixedProxy::onProxySocketConnected);
         connect (proxySocket, &QTcpSocket::readyRead,
-                 this, &HttpProxy::onProxySocketReadyRead);
+                 this, &MixedProxy::onProxySocketReadyRead);
     } else {
         connect (proxySocket, &QTcpSocket::connected,
-                 this, &HttpProxy::onProxySocketConnectedHttps);
+                 this, &MixedProxy::onProxySocketConnectedHttps);
     }
     connect (proxySocket, &QTcpSocket::disconnected,
              proxySocket, &QTcpSocket::deleteLater);
@@ -152,24 +152,24 @@ void HttpProxy::onSocketReadyRead()
              static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
              (&QTcpSocket::error),
              this,
-             &HttpProxy::onSocketError);
+             &MixedProxy::onSocketError);
     proxySocket->connectToHost(host, port);
   }
 }
 
-void HttpProxy::onProxySocketConnected()
+void MixedProxy::onProxySocketConnected()
 {
     QTcpSocket *proxySocket = qobject_cast<QTcpSocket *>(sender());
     QByteArray reqData = proxySocket->property("reqData").toByteArray();
     proxySocket->write(reqData);
 }
 
-void HttpProxy::onProxySocketConnectedHttps()
+void MixedProxy::onProxySocketConnectedHttps()
 {
     QTcpSocket *proxySocket = qobject_cast<QTcpSocket *>(sender());
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(proxySocket->parent());
     disconnect(socket, &QTcpSocket::readyRead,
-               this, &HttpProxy::onSocketReadyRead);
+               this, &MixedProxy::onSocketReadyRead);
 
     /*
      * once it's connected
@@ -185,7 +185,7 @@ void HttpProxy::onProxySocketConnectedHttps()
     socket->write(httpsHeader);
 }
 
-void HttpProxy::onProxySocketReadyRead()
+void MixedProxy::onProxySocketReadyRead()
 {
     QTcpSocket *proxySocket = qobject_cast<QTcpSocket *>(sender());
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(proxySocket->parent());

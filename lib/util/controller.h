@@ -27,7 +27,7 @@
 #include <QObject>
 #include "network/tcpserver.h"
 #include "export.h"
-#include "network/httpproxy.h"
+#include "network/mixedproxy.h"
 #include "types/profile.h"
 #include "network/udprelay.h"
 
@@ -98,7 +98,7 @@ protected:
     const bool autoBan;
     std::unique_ptr<TcpServer> tcpServer;
     std::unique_ptr<UdpRelay> udpRelay;
-    std::unique_ptr<HttpProxy> httpProxy;
+    std::unique_ptr<MixedProxy> mixedProxy;
 
     QHostAddress getLocalAddr();
 

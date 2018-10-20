@@ -32,13 +32,13 @@
 
 namespace QSS {
 
-class QSS_EXPORT HttpProxy : public QTcpServer
+class QSS_EXPORT MixedProxy : public QTcpServer
 {
     Q_OBJECT
 public:
-    HttpProxy();
+    MixedProxy();
 
-    HttpProxy(const HttpProxy &) = delete;
+    MixedProxy(const MixedProxy &) = delete;
 
     /*
      * DO NOT use listen() function, use httpListen instead

@@ -60,7 +60,7 @@ bool Client::readConfig(const QString &file)
     profile.setServerAddress(confObj["server"].toString().toStdString());
     profile.setServerPort(confObj["server_port"].toInt());
     profile.setTimeout(confObj["timeout"].toInt());
-    profile.setHttpProxy(confObj["http_proxy"].toBool());
+    profile.setMixedProxy(confObj["http_proxy"].toBool());
     if (confObj["auth"].toBool()) {
         QDebug(QtMsgType::QtCriticalMsg) << "OTA is deprecated, please remove OTA from the configuration file.";
     }
@@ -84,7 +84,7 @@ void Client::setup(const QString &remote_addr,
     profile.setPassword(password.toStdString());
     profile.setMethod(method.toStdString());
     profile.setTimeout(timeout.toInt());
-    profile.setHttpProxy(http_proxy);
+    profile.setMixedProxy(http_proxy);
 }
 
 void Client::setAutoBan(bool ban)
@@ -94,7 +94,7 @@ void Client::setAutoBan(bool ban)
 
 void Client::setHttpMode(bool http)
 {
-    profile.setHttpProxy(http);
+    profile.setMixedProxy(http);
 }
 
 bool Client::start(bool _server)

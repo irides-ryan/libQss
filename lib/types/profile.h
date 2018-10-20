@@ -49,7 +49,7 @@ public:
     uint16_t serverPort() const;
     uint16_t localPort() const;
     int timeout() const;
-    bool httpProxy() const;
+    bool mixedProxy() const;
     bool debug() const;
     bool hasPlugin() const;
     bool proxy() const;
@@ -78,7 +78,7 @@ public:
     void setServerPort(uint16_t);
     void setLocalPort(uint16_t);
     void setTimeout(int);
-    void setHttpProxy(bool);
+    void setMixedProxy(bool);
     void setProxy(bool);
     void setProxyType(int);
     void setProxyServerAddress(const std::string& address);

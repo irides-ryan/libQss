@@ -5,7 +5,7 @@
 namespace QSS {
 
 struct ProfilePrivate {
-    bool httpProxy = false;
+    bool mixedProxy = false;
     bool debug = false;
     std::string pluginExec;
     std::string pluginOpts;
@@ -117,9 +117,9 @@ bool Profile::debug() const
     return d_private->debug;
 }
 
-bool Profile::httpProxy() const
+bool Profile::mixedProxy() const
 {
-    return d_private->httpProxy;
+    return d_private->mixedProxy;
 }
 
 bool Profile::isValid() const
@@ -196,9 +196,9 @@ void Profile::setTimeout(int t)
     d_timeout = t;
 }
 
-void Profile::setHttpProxy(bool e)
+void Profile::setMixedProxy(bool e)
 {
-    d_private->httpProxy = e;
+    d_private->mixedProxy = e;
 }
 
 void Profile::setProxy(bool proxy) {

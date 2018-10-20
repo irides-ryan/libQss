@@ -29,7 +29,7 @@ void Profile::testConstructorEmpty()
     QCOMPARE(uint16_t(0), p.localPort());
     QCOMPARE(600, p.timeout());
     QVERIFY(!p.debug());
-    QVERIFY(!p.httpProxy());
+    QVERIFY(!p.mixedProxy());
 }
 
 void Profile::testFromUri()

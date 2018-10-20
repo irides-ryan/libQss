@@ -112,19 +112,19 @@ bool Controller::start()
 
     if (isLocal) {
         qInfo("Running in local mode.");
-        QHostAddress localAddress = profile.httpProxy()
+        QHostAddress localAddress = profile.mixedProxy()
             ? QHostAddress::LocalHost
             : getLocalAddr();
         listen_ret = tcpServer->listen(
                     localAddress,
-                    profile.httpProxy() ? 0 : profile.localPort());
+                    profile.mixedProxy() ? 0 : profile.localPort());
         if (listen_ret) {
             listen_ret = udpRelay->listen(localAddress, profile.localPort());
-            if (profile.httpProxy() && listen_ret) {
+            if (profile.mixedProxy() && listen_ret) {
                 QDebug(QtMsgType::QtInfoMsg) << "SOCKS5 port is"
                                              << tcpServer->serverPort();
-                httpProxy = std::make_unique<QSS::HttpProxy>();
-                if (httpProxy->httpListen(getLocalAddr(),
+                mixedProxy = std::make_unique<QSS::MixedProxy>();
+                if (mixedProxy->httpListen(getLocalAddr(),
                                           profile.localPort(),
                                           tcpServer->serverPort())) {
                     qInfo("Running as a HTTP proxy server");
@@ -159,8 +159,8 @@ bool Controller::start()
 
 void Controller::stop()
 {
-    if (httpProxy) {
-        httpProxy->close();
+    if (mixedProxy) {
+        mixedProxy->close();
     }
     tcpServer->close();
     udpRelay->close();

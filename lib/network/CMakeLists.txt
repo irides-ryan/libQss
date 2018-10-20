@@ -1,5 +1,5 @@
 list(APPEND SOURCE
-    ${CMAKE_CURRENT_LIST_DIR}/httpproxy.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/mixedproxy.cpp
     ${CMAKE_CURRENT_LIST_DIR}/socketstream.cpp
     ${CMAKE_CURRENT_LIST_DIR}/tcprelay.cpp
     ${CMAKE_CURRENT_LIST_DIR}/tcprelayclient.cpp
@@ -9,7 +9,7 @@ list(APPEND SOURCE
     )
 
 set(NETWORK_HEADERS
-    ${CMAKE_CURRENT_LIST_DIR}/httpproxy.h
+    ${CMAKE_CURRENT_LIST_DIR}/mixedproxy.h
     ${CMAKE_CURRENT_LIST_DIR}/socketstream.h
     ${CMAKE_CURRENT_LIST_DIR}/tcprelay.h
     ${CMAKE_CURRENT_LIST_DIR}/tcprelayclient.h
