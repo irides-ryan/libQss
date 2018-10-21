@@ -44,9 +44,9 @@ public:
      * DO NOT use listen() function, use httpListen instead
      * The socks_port is local socks proxy server port
      */
-    bool httpListen(const QHostAddress &http_addr,
-                    uint16_t http_port,
-                    uint16_t socks_port);
+    bool listen(const QHostAddress &http_addr,
+                uint16_t http_port,
+                uint16_t socks_port);
 
 protected:
     void incomingConnection(qintptr handle);

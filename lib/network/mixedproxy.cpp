@@ -33,15 +33,15 @@ MixedProxy::MixedProxy() : QTcpServer()
     this->setMaxPendingConnections(FD_SETSIZE);
 }
 
-bool MixedProxy::httpListen(const QHostAddress &http_addr,
-                           uint16_t http_port,
-                           uint16_t socks_port)
+bool MixedProxy::listen(const QHostAddress &http_addr,
+                        uint16_t http_port,
+                        uint16_t socks_port)
 {
     this->socks_port = socks_port;
     upstreamProxy = QNetworkProxy(QNetworkProxy::Socks5Proxy,
                                   "127.0.0.1",
                                   socks_port);
-    return this->listen(http_addr, http_port);
+    return QTcpServer::listen(http_addr, http_port);
 }
 
 void MixedProxy::incomingConnection(qintptr socketDescriptor)

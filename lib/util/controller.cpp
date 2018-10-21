@@ -124,12 +124,12 @@ bool Controller::start()
                 QDebug(QtMsgType::QtInfoMsg) << "SOCKS5 port is"
                                              << tcpServer->serverPort();
                 mixedProxy = std::make_unique<QSS::MixedProxy>();
-                if (mixedProxy->httpListen(getLocalAddr(),
-                                          profile.localPort(),
-                                          tcpServer->serverPort())) {
-                    qInfo("Running as a HTTP proxy server");
+                if (mixedProxy->listen(getLocalAddr(),
+                                       profile.localPort(),
+                                       tcpServer->serverPort())) {
+                    qInfo("Enable Mixed Proxy!");
                 } else {
-                    qCritical("HTTP proxy server listen failed.");
+                    qCritical("Mixed Proxy port listen failed.");
                     listen_ret = false;
                 }
             }
