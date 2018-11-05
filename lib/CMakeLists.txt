@@ -27,6 +27,9 @@ file(GLOB_RECURSE SOURCE
 
         types/address.cpp
         types/profile.cpp
+        types/configuration.cc
+        types/server.cc
+        types/proxy.cc
 
         util/addresstester.cpp
         util/common.cpp
