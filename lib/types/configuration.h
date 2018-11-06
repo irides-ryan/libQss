@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QList>
+#include <QtNetwork/QHostAddress>
 
 #include "server.h"
 #include "proxy.h"
@@ -19,6 +20,7 @@ protected:
   Proxy m_proxy;
   IChooser *m_chooser = nullptr;
   bool m_shareOverLan;
+  uint16_t m_localPort;
 
 public:
   Configuration();
@@ -58,6 +60,15 @@ public:
   bool getShareOverLan() {
     return m_shareOverLan;
   }
+
+  QHostAddress getLocalAddress() {
+    return m_shareOverLan ? QHostAddress::Any : QHostAddress::LocalHost;
+  }
+
+  uint16_t getLocalPort() {
+    return m_localPort;
+  }
+
 };
 
 }

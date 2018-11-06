@@ -12,10 +12,12 @@ public:
   const static uint16_t SERVER_TIMEOUT_MAX = 20;
 
   QString server;
+  QString local;
   QString passwd;
   QString method;
   QString remarks;
   uint16_t server_port;
+  uint16_t local_port;
   uint16_t timeout;
 
   Server();

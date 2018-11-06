@@ -2,9 +2,8 @@
 
 namespace QSS {
 
-Configuration::Configuration() : m_shareOverLan(false) {
-
-}
+Configuration::Configuration()
+        : m_shareOverLan(false) {}
 
 Configuration::~Configuration() {
   unregisterChooser();
