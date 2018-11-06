@@ -33,7 +33,8 @@ file(GLOB_RECURSE SOURCE
 
         util/addresstester.cpp
         util/common.cpp
-        util/controller.cpp)
+        util/controller.cpp
+        util/listener.cc)
 
 add_library(${LIBNAME} ${SOURCE})
 
