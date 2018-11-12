@@ -57,6 +57,7 @@ endif()
 
 add_subdirectory(lib)
 add_subdirectory(shadowsocks-libqss)
+add_subdirectory(basic)
 find_package(Qt5Test)
 if (Qt5Test_FOUND)
     # enable_testing() has to be in the root CMakeLists.txt, see https://cmake.org/pipermail/cmake/2010-November/040725.html
