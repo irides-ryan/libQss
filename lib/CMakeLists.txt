@@ -25,6 +25,10 @@ file(GLOB_RECURSE SOURCE
         network/tcpserver.cpp
         network/udprelay.cpp
 
+        net/tcprelay.cc
+        net/udprelay.cc
+        net/tcphandler.cc
+
         types/address.cpp
         types/profile.cpp
         types/configuration.cc

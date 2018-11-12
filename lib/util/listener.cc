@@ -13,13 +13,8 @@ Listener::~Listener() {
 
 bool Listener::start(QSS::Configuration &config) {
   bool ret;
-  auto localAddress = config.getLocalAddress();
-  auto localPort = config.getLocalPort();
-
-  Q_ASSERT(localPort != 0);
-
-  m_tcpReply = std::make_unique<QTcpServer>();
-  ret = m_tcpReply->listen(localAddress, localPort);
+  m_tcpReply = std::make_unique<QSX::TcpRelay>(config);
+  ret = m_tcpReply->listen();
   if (!ret) {
     // show error message
     m_tcpReply->close();
@@ -27,7 +22,7 @@ bool Listener::start(QSS::Configuration &config) {
   }
 
   m_udpReply = std::make_unique<QUdpSocket>();
-  ret = m_udpReply->bind(localAddress, localPort);
+  ret = m_udpReply->bind();
   if (!ret) {
     // show error message
     m_udpReply->close();

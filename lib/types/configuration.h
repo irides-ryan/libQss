@@ -36,6 +36,10 @@ public:
     m_proxy = proxy;
   }
 
+  void setLocalPort(uint16_t port) {
+    m_localPort = port;
+  }
+
   void registerChooser(IChooser *chooser) {
     m_chooser = chooser;
   }

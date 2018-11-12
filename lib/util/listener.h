@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
+#include "net/tcprelay.h"
 #include <QtNetwork/QUdpSocket>
-#include <QtNetwork/QTcpServer>
 #include "types/configuration.h"
 
 namespace QSS {
@@ -10,7 +10,7 @@ namespace QSS {
 class Listener {
 private:
   // tcp_reply
-  std::unique_ptr<QTcpServer> m_tcpReply = nullptr;
+  std::unique_ptr<QSX::TcpRelay> m_tcpReply = nullptr;
   // udp_reply
   std::unique_ptr<QUdpSocket> m_udpReply = nullptr;
 
