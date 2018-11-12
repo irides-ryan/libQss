@@ -44,7 +44,7 @@ public:
      * @param method The encryption method in Shadowsocks convention
      * @param password The preshared password
      */
-    Encryptor(std::string method,
+    Encryptor(const std::string &method,
               const std::string& password);
 
     Encryptor(const Encryptor &) = delete;

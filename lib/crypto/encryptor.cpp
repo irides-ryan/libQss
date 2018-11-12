@@ -56,9 +56,9 @@ std::string evpBytesToKey(const QSS::Cipher::CipherInfo& cipherInfo,
 }  // namespace
 
 namespace  QSS {
-Encryptor::Encryptor(std::string method,
+Encryptor::Encryptor(const std::string &method,
                      const std::string &password) :
-    m_method(std::move(method)),
+    m_method(method),
     cipherInfo(Cipher::cipherInfoMap.at(m_method)),
     masterKey(evpBytesToKey(cipherInfo, password)),
     incompleteLength(0)
