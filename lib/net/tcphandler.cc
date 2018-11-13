@@ -8,9 +8,9 @@
 
 namespace QSX {
 
-const char TcpHandler::HANDLE_ACCEPT[] = {5, 0};
-const char TcpHandler::HANDLE_REJECT[] = {0, 91};
-const char TcpHandler::HANDLE_RESPONSE[] = {5, 0, 0, 1, 0, 0, 0, 0, 0, 0};
+const char TcpHandler::HANDLE_ACCEPT[] = { 5, 0 };
+const char TcpHandler::HANDLE_REJECT[] = { 0, 91 };
+const char TcpHandler::HANDLE_RESPONSE[] = { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
 
 TcpHandler::TcpHandler(QTcpSocket *socket, QSS::Configuration &configuration) {
   m_local.reset(socket);
@@ -19,21 +19,18 @@ TcpHandler::TcpHandler(QTcpSocket *socket, QSS::Configuration &configuration) {
   QObject::connect(m_local.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvLocal);
   QObject::connect(m_local.get(),
                    static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error),
-                   [=]() {
-                     if (m_local->error() == QAbstractSocket::RemoteHostClosedError) {
-                       qDebug() << "TcpHandler: local: " << m_local->errorString();
-                     } else {
-                       qWarning() << "TcpHandler: local: " << m_local->errorString();
-                     }
-                     close();
-                   });
+                   this,
+                   &TcpHandler::onErrorLocal);
 }
 
 TcpHandler::~TcpHandler() {
-  close();
+  if (m_state != DESTROYED) {
+    close(GOOD);
+  }
+  qDebug() << "tcp_handler died";
 }
 
-void TcpHandler::close() {
+void TcpHandler::close(int r) {
   if (m_local) {
     m_local->close();
   }
@@ -42,6 +39,7 @@ void TcpHandler::close() {
   }
   delete m_encryptor;
   m_state = DESTROYED;
+  emit finished(r);
 }
 
 /**
@@ -68,9 +66,9 @@ void TcpHandler::handle(QByteArray &data) {
      *  | 1  |   1    |
      *  +----+--------+
      */
-
     if (data.size() < 2) {
-      goto close;
+      close(E_DATA_LENGTH);
+      return;
     }
 
     if (data[0] != char(5)) {
@@ -98,42 +96,45 @@ void TcpHandler::handle(QByteArray &data) {
      *  +----+-----+-------+------+----------+----------+
      */
     if (data.size() < 5 || data[0] != char(5)) {
-      goto close;
+      close(E_DATA_LENGTH);
+      return;
     }
     char cmd = data[1];
     switch (cmd) {
       // TODO use enum or definition
-      case 0x01: {
-        // CONNECT
-        data = data.remove(0, 3);
-        int length;
-        QSS::Address destination;
-        std::string header;
-        header.resize(data.size());
-        memcpy(&header[0], data.data(), data.size());
-        QSS::Common::parseHeader(header, destination, length);
-        if (0 == length) {
-          qDebug() << "parse error";
-          // parse error
-          goto close;
-        }
-
-        qDebug() << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
-
-        // reply to client
-        m_local->write(HANDLE_RESPONSE, sizeof(HANDLE_RESPONSE));
-
-        createRemote(destination);
-        m_state = CONNECTING;
-        handle(data);
-        break;
+    case 0x01: {
+      // CONNECT
+      data = data.remove(0, 3);
+      int length;
+      QSS::Address destination;
+      std::string header;
+      header.resize(data.size());
+      memcpy(&header[0], data.data(), data.size());
+      QSS::Common::parseHeader(header, destination, length);
+      if (0 == length) {
+        qDebug() << "parse error";
+        // parse error
+        close(E_PARSE_ADDRESS);
+        return;
       }
-      case 0x03:
-        // UDP ASSOCIATE
+      qDebug() << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
 
-      default:
-        qWarning() << "unknown socks5 cmd! [" << QString::number(cmd) << "]";
-        goto close;
+      // reply to client
+      m_local->write(HANDLE_RESPONSE, sizeof(HANDLE_RESPONSE));
+
+      createRemote(destination);
+      m_state = CONNECTING;
+      handle(data);
+      break;
+    }
+
+    case 0x03:
+      // UDP ASSOCIATE
+
+    default:
+      qWarning() << "unknown socks5 cmd! [" << QString::number(cmd) << "]";
+      close(E_NO_CMD);
+      return;
     }
 
   } else if (m_state == CONNECTING) {
@@ -143,10 +144,6 @@ void TcpHandler::handle(QByteArray &data) {
     sendToRemote(wannaWrite);
     wannaWrite.clear();
   }
-
-  return;
-close:
-  close();
 }
 
 void TcpHandler::createRemote(QSS::Address &destination) {
@@ -224,13 +221,22 @@ void TcpHandler::onConnectedRemote() {
   handle(none);
 }
 
+void TcpHandler::onErrorLocal() {
+  if (m_local->error() == QAbstractSocket::RemoteHostClosedError) {
+    close(E_CLOSE_LOCAL);
+  } else {
+    qWarning() << "TcpHandler: local: " << m_local->errorString();
+    close(E_OTHER_LOCAL);
+  }
+}
+
 void TcpHandler::onErrorRemote() {
   if (m_remote->error() == QAbstractSocket::RemoteHostClosedError) {
-    qDebug() << "TcpHandler: remote: " << m_remote->errorString();
+    close(E_CLOSE_REMOTE);
   } else {
     qWarning() << "TcpHandler: remote: " << m_remote->errorString();
+    close(E_OTHER_REMOTE);
   }
-  close();
 }
 
 }
