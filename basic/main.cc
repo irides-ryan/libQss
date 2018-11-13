@@ -1,8 +1,18 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
+#include <signal.h>
 #include "../lib/util/listener.h"
 
+void signal_handler(int signal) {
+  if (signal == SIGINT || signal == SIGTERM) {
+    qDebug() << "SIGNAL: " << signal;
+    qApp->quit();
+  }
+}
+
 int main(int argc, char **argv) {
+
+  signal(SIGINT, signal_handler);
 
   QCoreApplication a(argc, argv);
 
