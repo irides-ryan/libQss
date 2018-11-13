@@ -12,18 +12,27 @@ class TcpHandler : public QObject {
 Q_OBJECT
 
   enum STATE {
-    INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED
+    INIT, ADDRESS, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED
   };
 
   enum ERRCODE {
-    GOOD, E_DATA_LENGTH, E_PARSE_ADDRESS, E_NO_CMD, E_CLOSE_REMOTE, E_CLOSE_LOCAL, E_OTHER_REMOTE, E_OTHER_LOCAL
+    GOOD,                 /* 0 close by manual */
+    E_DATA_LENGTH,        /* 1 data length not correct */
+    E_PARSE_ADDRESS,      /* 2 failed at parse HEADER address */
+    E_NO_CMD,             /* 3 no such command */
+    E_CLOSE_REMOTE,       /* 4 socket closed by remote */
+    E_CLOSE_LOCAL,        /* 5 socket closed by local */
+    E_TIMEOUT_REMOTE,     /* 6 timeout when connecting to remote */
+    E_TIMEOUT_LOCAL,      /* 7 timeout when connecting to local */
+    E_OTHER_REMOTE,       /* 8 other error occurred on remote socket */
+    E_OTHER_LOCAL         /* 9 other error occurred on local socket */
   };
 
   static const char HANDLE_ACCEPT[], HANDLE_REJECT[], HANDLE_RESPONSE[];
 
   std::unique_ptr<QTcpSocket> m_local, m_remote;
-  QSS::Configuration *m_config;
-  QSS::Encryptor *m_encryptor;
+  QSS::Configuration *m_config = nullptr;
+  std::unique_ptr<QSS::Encryptor> m_encryptor = nullptr;
 
 public:
   TcpHandler(QTcpSocket *socket, QSS::Configuration &configuration);

@@ -1,5 +1,4 @@
 #include <memory>
-
 #include <error.h>
 #include <util/common.h>
 #include <types/address.h>
@@ -40,7 +39,9 @@ void TcpHandler::close(int r) {
   if (m_remote) {
     m_remote->close();
   }
-  delete m_encryptor;
+  if (m_encryptor) {
+    m_encryptor.reset();
+  }
   m_state = DESTROYED;
   emit finished(r);
 }
@@ -79,9 +80,9 @@ void TcpHandler::handle(QByteArray &data) {
     } else {
       // ok
       m_local->write(HANDLE_ACCEPT, sizeof(HANDLE_ACCEPT));
-      m_state = ADDR;
+      m_state = ADDRESS;
     }
-  } else if (m_state == ADDR) {
+  } else if (m_state == ADDRESS) {
     /**
      *  client -> server
      *  +----+-----+-------+------+----------+----------+
@@ -173,7 +174,7 @@ void TcpHandler::createRemote(QSS::Address &destination) {
 
   auto method = remote.method.toStdString();
   auto passwd = remote.passwd.toStdString();
-  m_encryptor = new QSS::Encryptor(method, passwd);
+  m_encryptor = std::make_unique<QSS::Encryptor>(method, passwd);
 }
 
 void TcpHandler::loadProxyRemote(QSS::Proxy &proxy) {
@@ -230,8 +231,10 @@ void TcpHandler::onConnectedRemote() {
 void TcpHandler::onErrorLocal() {
   if (m_local->error() == QAbstractSocket::RemoteHostClosedError) {
     close(E_CLOSE_LOCAL);
+  } else if (m_local->error() == QAbstractSocket::SocketTimeoutError) {
+    close(E_TIMEOUT_LOCAL);
   } else {
-    qWarning() << "TcpHandler: local: " << m_local->errorString();
+    dout << "TcpHandler: local: " << m_local->errorString();
     close(E_OTHER_LOCAL);
   }
 }
@@ -239,8 +242,10 @@ void TcpHandler::onErrorLocal() {
 void TcpHandler::onErrorRemote() {
   if (m_remote->error() == QAbstractSocket::RemoteHostClosedError) {
     close(E_CLOSE_REMOTE);
+  } else if (m_remote->error() == QAbstractSocket::SocketTimeoutError) {
+    close(E_TIMEOUT_REMOTE);
   } else {
-    qWarning() << "TcpHandler: remote: " << m_remote->errorString();
+    dout << "TcpHandler: remote: " << m_remote->errorString();
     close(E_OTHER_REMOTE);
   }
 }
