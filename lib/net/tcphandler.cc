@@ -3,6 +3,7 @@
 #include <error.h>
 #include <util/common.h>
 #include <types/address.h>
+#include <QtNetwork/QNetworkProxy>
 #include "tcphandler.h"
 
 namespace QSX {
@@ -151,20 +152,43 @@ close:
 void TcpHandler::createRemote() {
   // choose a server
   auto remote = m_config->getServer();
-
   qDebug() << "createRemote: server:" << remote.server << ":" << remote.server_port << "," << remote.method;
+
   // init the server and encryptor
   m_remote = std::make_unique<QTcpSocket>();
+
   QObject::connect(m_remote.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvRemote);
   QObject::connect(m_remote.get(),
                    static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error),
                    this,
                    &TcpHandler::onErrorRemote);
   QObject::connect(m_remote.get(), &QTcpSocket::connected, this, &TcpHandler::onConnectedRemote);
+
+  loadProxyRemote(m_config->getProxy());
   m_remote->connectToHost(remote.server, remote.server_port);
+
   auto method = remote.method.toStdString();
   auto passwd = remote.passwd.toStdString();
   m_encryptor = new QSS::Encryptor(method, passwd);
+}
+
+void TcpHandler::loadProxyRemote(QSS::Proxy &proxy) {
+  if (proxy.use) {
+    QNetworkProxy p;
+    QNetworkProxy::ProxyType type;
+    if (proxy.type == QSS::Proxy::HTTP) {
+      type = QNetworkProxy::HttpProxy;
+    } else if (proxy.type == QSS::Proxy::SOCKS5) {
+      type = QNetworkProxy::Socks5Proxy;
+    } else {
+      // unknown type, do not set
+      return;
+    }
+    p.setType(type);
+    p.setHostName(proxy.server);
+    p.setPort(proxy.port);
+    m_remote->setProxy(p);
+  }
 }
 
 void TcpHandler::sendToRemote(QByteArray &data) {

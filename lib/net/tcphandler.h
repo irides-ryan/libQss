@@ -41,6 +41,7 @@ private:
 
   void handle(QByteArray &data);
   void createRemote();
+  void loadProxyRemote(QSS::Proxy &proxy);
   void sendToRemote(QByteArray &data);
 
 protected slots:

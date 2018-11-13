@@ -17,6 +17,14 @@ int main(int argc, char **argv) {
   QList<QSS::Server> servers;
   servers.append(server);
   configuration.setServers(servers);
+
+  QSS::Proxy proxy;
+  proxy.use = true;
+  proxy.server = "10.167.196.133";
+  proxy.port = 8080;
+  proxy.type = QSS::Proxy::HTTP;
+  configuration.setProxy(proxy);
+
   configuration.setLocalPort(1080);
 
   QSS::Listener listener;
