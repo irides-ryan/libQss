@@ -42,6 +42,7 @@ public:
 private:
   STATE m_state = INIT;
   uint64_t m_countRead = 0, m_countWrite = 0;
+  QByteArray m_wannaWrite;
 
   void handle(QByteArray &data);
   void createRemote(QSS::Address &destination);

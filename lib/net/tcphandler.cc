@@ -6,6 +6,8 @@
 #include <QtNetwork/QNetworkProxy>
 #include "tcphandler.h"
 
+#define dout (qDebug() << "[" << this << "]")
+
 namespace QSX {
 
 const char TcpHandler::HANDLE_ACCEPT[] = { 5, 0 };
@@ -15,6 +17,7 @@ const char TcpHandler::HANDLE_RESPONSE[] = { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
 TcpHandler::TcpHandler(QTcpSocket *socket, QSS::Configuration &configuration) {
   m_local.reset(socket);
   m_config = &configuration;
+  m_wannaWrite.clear();
 
   QObject::connect(m_local.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvLocal);
   QObject::connect(m_local.get(),
@@ -27,7 +30,7 @@ TcpHandler::~TcpHandler() {
   if (m_state != DESTROYED) {
     close(GOOD);
   }
-  qDebug() << "tcp_handler died";
+  dout << "tcp_handler died";
 }
 
 void TcpHandler::close(int r) {
@@ -48,7 +51,6 @@ void TcpHandler::close(int r) {
  * @param data data from client
  */
 void TcpHandler::handle(QByteArray &data) {
-  static QByteArray wannaWrite;
   if (m_state == INIT) {
     /** Authentication
      *
@@ -112,44 +114,49 @@ void TcpHandler::handle(QByteArray &data) {
       memcpy(&header[0], data.data(), data.size());
       QSS::Common::parseHeader(header, destination, length);
       if (0 == length) {
-        qDebug() << "parse error";
+        dout << "parse error";
         // parse error
         close(E_PARSE_ADDRESS);
         return;
       }
-      qDebug() << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
+      dout << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
 
       // reply to client
       m_local->write(HANDLE_RESPONSE, sizeof(HANDLE_RESPONSE));
 
       createRemote(destination);
       m_state = CONNECTING;
+
+      Q_ASSERT(data.size() != 0);
+
       handle(data);
-      break;
+      return;
     }
 
     case 0x03:
       // UDP ASSOCIATE
+      Q_ASSERT(false);
 
     default:
       qWarning() << "unknown socks5 cmd! [" << QString::number(cmd) << "]";
       close(E_NO_CMD);
       return;
     }
-
   } else if (m_state == CONNECTING) {
-    wannaWrite += data;
+    m_wannaWrite += data;
   } else if (m_state == STREAM) {
-    wannaWrite += data;
-    sendToRemote(wannaWrite);
-    wannaWrite.clear();
+    m_wannaWrite += data;
+    sendToRemote(m_wannaWrite);
+    m_wannaWrite.clear();
+  } else {
+    Q_ASSERT(false);
   }
 }
 
 void TcpHandler::createRemote(QSS::Address &destination) {
   // choose a server
   auto remote = m_config->getServer(destination);
-  qDebug() << "createRemote: server:" << remote.server << ":" << remote.server_port << "," << remote.method;
+  dout << "createRemote: server:" << remote.server << ":" << remote.server_port << "," << remote.method;
 
   // init the server and encryptor
   m_remote = std::make_unique<QTcpSocket>();
@@ -199,7 +206,7 @@ void TcpHandler::sendToRemote(QByteArray &data) {
 void TcpHandler::onRecvLocal() {
   auto data = m_local->readAll();
   if (data.isEmpty()) {
-    qDebug() << "no data or maybe error occurred.";
+    dout << "no data or maybe error occurred.";
     return;
   }
 
@@ -216,7 +223,6 @@ void TcpHandler::onRecvRemote() {
 
 void TcpHandler::onConnectedRemote() {
   static QByteArray none;
-  qDebug() << "connected";
   m_state = STREAM;
   handle(none);
 }
