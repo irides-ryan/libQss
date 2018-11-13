@@ -33,7 +33,7 @@ bool TcpRelay::listen() {
 
 void TcpRelay::close() {
   for (auto handler : m_cache) {
-    delete handler;
+    handler->deleteLater();
   }
   m_cache.clear();
 }
@@ -43,11 +43,17 @@ void TcpRelay::accepted() {
 
   qDebug() << "TcpReply accept a connection:" << client->peerAddress().toString() << ":" << client->peerPort();
   auto handler = new TcpHandler(client, m_config);
+  QObject::connect(handler, &TcpHandler::finished, [=](int r) {
+    qDebug() << "[" << handler << "]" << "handler closed [" << r << "]" << "now left" << m_cache.size();
+    m_cache.remove(handler);
+    handler->deleteLater();
+    qDebug() << "removed, left" << m_cache.size();
+  });
   QObject::connect(handler, &TcpHandler::bytesRead, [=](uint64_t s) {
-    qDebug() << "r += " << s << "\t\tR:" << handler->getCountRead();
+    qDebug() << "[" << handler << "]" << "r += " << s << "\t\tR:" << handler->getCountRead();
   });
   QObject::connect(handler, &TcpHandler::bytesWrite, [=](uint64_t s) {
-    qDebug() << "w += " << s << "\t\tW:" << handler->getCountWrite();
+    qDebug() << "[" << handler << "]" << "w += " << s << "\t\tW:" << handler->getCountWrite();
   });
   m_cache.emplace_back(handler);
 }
