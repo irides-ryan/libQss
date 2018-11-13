@@ -18,7 +18,7 @@ Q_OBJECT
   enum ERRCODE {
     GOOD,                 /* 0 close by manual */
     E_DATA_LENGTH,        /* 1 data length not correct */
-    E_PARSE_ADDRESS,      /* 2 failed at parse HEADER address */
+    E_READ_HEADER,        /* 2 failed at parse HEADER address */
     E_NO_CMD,             /* 3 no such command */
     E_CLOSE_REMOTE,       /* 4 socket closed by remote */
     E_CLOSE_LOCAL,        /* 5 socket closed by local */
@@ -57,6 +57,7 @@ private:
   void createRemote(QSS::Address &destination);
   void loadProxyRemote(Proxy &proxy);
   void sendToRemote(QByteArray &data);
+  bool readHeader(QByteArray &data, Address &destination);
 
 protected slots:
   void onRecvLocal();

@@ -9,6 +9,8 @@
 
 namespace QSX {
 
+using Overload = QOverload<QAbstractSocket::SocketError>;
+
 const char TcpHandler::HANDLE_ACCEPT[] = { 5, 0 };
 const char TcpHandler::HANDLE_REJECT[] = { 0, 91 };
 const char TcpHandler::HANDLE_RESPONSE[] = { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
@@ -19,17 +21,13 @@ TcpHandler::TcpHandler(QTcpSocket *socket, Configuration &configuration) {
   m_wannaWrite.clear();
 
   QObject::connect(m_local.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvLocal);
-  QObject::connect(m_local.get(),
-                   static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error),
-                   this,
-                   &TcpHandler::onErrorLocal);
+  QObject::connect(m_local.get(), Overload::of(&QTcpSocket::error), this, &TcpHandler::onErrorLocal);
 }
 
 TcpHandler::~TcpHandler() {
   if (m_state != DESTROYED) {
     close(GOOD);
   }
-  dout << "tcp_handler died";
 }
 
 void TcpHandler::close(int r) {
@@ -108,16 +106,10 @@ void TcpHandler::handle(QByteArray &data) {
     case 0x01: {
       // CONNECT
       data = data.remove(0, 3);
-      int length;
       QSS::Address destination;
-      std::string header;
-      header.resize(data.size());
-      memcpy(&header[0], data.data(), data.size());
-      QSS::Common::parseHeader(header, destination, length);
-      if (0 == length) {
-        dout << "parse error";
+      if (!readHeader(data, destination)) {
         // parse error
-        close(E_PARSE_ADDRESS);
+        close(E_READ_HEADER);
         return;
       }
       dout << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
@@ -139,7 +131,6 @@ void TcpHandler::handle(QByteArray &data) {
       Q_ASSERT(false);
 
     default:
-      qWarning() << "unknown socks5 cmd! [" << QString::number(cmd) << "]";
       close(E_NO_CMD);
       return;
     }
@@ -163,10 +154,7 @@ void TcpHandler::createRemote(QSS::Address &destination) {
   m_remote = std::make_unique<QTcpSocket>();
 
   QObject::connect(m_remote.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvRemote);
-  QObject::connect(m_remote.get(),
-                   static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error),
-                   this,
-                   &TcpHandler::onErrorRemote);
+  QObject::connect(m_remote.get(), Overload::of(&QTcpSocket::error), this, &TcpHandler::onErrorRemote);
   QObject::connect(m_remote.get(), &QTcpSocket::connected, this, &TcpHandler::onConnectedRemote);
 
   loadProxyRemote(m_config->getProxy());
@@ -202,6 +190,46 @@ void TcpHandler::sendToRemote(QByteArray &data) {
   m_countWrite += enc.size();
   emit bytesWrite(enc.size());
   m_remote->write(enc.data(), (int)enc.size());
+}
+
+bool TcpHandler::readHeader(QByteArray &data, Address &destination) {
+  Q_ASSERT(data.size() > 2);
+  switch (data[0]) {
+  case Address::HOST: {
+    /* [type|length|host name|port] */
+    auto length = data[1];
+    if (data.size() != (2 + length + 2)) {
+      return false;
+    }
+    std::string address(data.mid(2, length));
+    destination.setAddress(address);
+    break;
+  }
+  case Address::IPV4: {
+    /* [type|IPV4|port] */
+    if (data.size() != 7) {
+      return false;
+    }
+    auto _ = data.mid(1, 4).data();
+    char address[4] = { _[3], _[2], _[1], _[0] };
+    destination.setIPAddress(QHostAddress(*(uint32_t *)&address));
+    break;
+  }
+  case Address::IPV6: {
+    /* [type|IPV6|port] */
+    auto address = data.mid(1, 16).data();
+    destination.setIPAddress(QHostAddress(*(QIPv6Address *)&address));
+    break;
+  }
+  default:
+    Q_ASSERT(false);
+    break;
+  }
+
+  auto _ = data.right(2).data();
+  char port[2] = { _[1], _[0] };
+  destination.setPort(*(uint16_t*)&port);
+  return true;
 }
 
 void TcpHandler::onRecvLocal() {
