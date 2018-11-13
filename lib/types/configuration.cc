@@ -9,9 +9,9 @@ Configuration::~Configuration() {
   unregisterChooser();
 }
 
-Server Configuration::getServer(int index) {
+Server Configuration::getServer(Address &destination, int index) {
   if (index < 0 && m_chooser) {
-    return m_chooser->getServer();
+    return m_chooser->getServer(destination);
   }
   if (m_servers.empty()) {
     return Server();

@@ -40,7 +40,7 @@ private:
   uint64_t m_countRead = 0, m_countWrite = 0;
 
   void handle(QByteArray &data);
-  void createRemote();
+  void createRemote(QSS::Address &destination);
   void loadProxyRemote(QSS::Proxy &proxy);
   void sendToRemote(QByteArray &data);
 

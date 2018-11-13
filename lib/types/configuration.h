@@ -5,13 +5,14 @@
 
 #include "server.h"
 #include "proxy.h"
+#include "address.h"
 
 namespace QSS {
 
 class IChooser {
 public:
   virtual ~IChooser() = default;
-  virtual Server getServer() = 0;
+  virtual Server getServer(Address &destination) = 0;
 };
 
 class Configuration {
@@ -26,7 +27,7 @@ public:
   Configuration();
   ~Configuration();
 
-  Server getServer(int index = -1);
+  Server getServer(Address &destination, int index = -1);
 
   void setServers(QList<Server> &servers) {
     m_servers = servers;

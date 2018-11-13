@@ -107,23 +107,23 @@ void TcpHandler::handle(QByteArray &data) {
         // CONNECT
         data = data.remove(0, 3);
         int length;
-        QSS::Address distance;
+        QSS::Address destination;
         std::string header;
         header.resize(data.size());
         memcpy(&header[0], data.data(), data.size());
-        QSS::Common::parseHeader(header, distance, length);
+        QSS::Common::parseHeader(header, destination, length);
         if (0 == length) {
           qDebug() << "parse error";
           // parse error
           goto close;
         }
 
-        qDebug() << "connecting to" << distance.getAddress().data() << ":" << distance.getPort();
+        qDebug() << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
 
         // reply to client
         m_local->write(HANDLE_RESPONSE, sizeof(HANDLE_RESPONSE));
 
-        createRemote();
+        createRemote(destination);
         m_state = CONNECTING;
         handle(data);
         break;
@@ -149,9 +149,9 @@ close:
   close();
 }
 
-void TcpHandler::createRemote() {
+void TcpHandler::createRemote(QSS::Address &destination) {
   // choose a server
-  auto remote = m_config->getServer();
+  auto remote = m_config->getServer(destination);
   qDebug() << "createRemote: server:" << remote.server << ":" << remote.server_port << "," << remote.method;
 
   // init the server and encryptor
