@@ -1,6 +1,6 @@
 #include "proxy.h"
 
-namespace QSS {
+namespace QSX {
 
 Proxy::Proxy()
         : use(false),

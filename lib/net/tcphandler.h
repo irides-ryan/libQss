@@ -31,11 +31,11 @@ Q_OBJECT
   static const char HANDLE_ACCEPT[], HANDLE_REJECT[], HANDLE_RESPONSE[];
 
   std::unique_ptr<QTcpSocket> m_local, m_remote;
-  QSS::Configuration *m_config = nullptr;
+  Configuration *m_config = nullptr;
   std::unique_ptr<QSS::Encryptor> m_encryptor = nullptr;
 
 public:
-  TcpHandler(QTcpSocket *socket, QSS::Configuration &configuration);
+  TcpHandler(QTcpSocket *socket, Configuration &configuration);
   ~TcpHandler() override;
 
   void close(int r = 0);
@@ -55,7 +55,7 @@ private:
 
   void handle(QByteArray &data);
   void createRemote(QSS::Address &destination);
-  void loadProxyRemote(QSS::Proxy &proxy);
+  void loadProxyRemote(Proxy &proxy);
   void sendToRemote(QByteArray &data);
 
 protected slots:

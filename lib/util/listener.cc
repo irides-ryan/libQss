@@ -1,6 +1,6 @@
 #include "listener.h"
 
-namespace QSS {
+namespace QSX {
 
 Listener::Listener() {
 
@@ -11,7 +11,7 @@ Listener::~Listener() {
   m_udpReply.reset();
 }
 
-bool Listener::start(QSS::Configuration &config) {
+bool Listener::start(Configuration &config) {
   bool ret;
   m_tcpReply = std::make_unique<QSX::TcpRelay>(config);
   ret = m_tcpReply->listen();

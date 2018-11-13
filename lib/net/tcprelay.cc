@@ -2,7 +2,7 @@
 
 namespace QSX {
 
-TcpRelay::TcpRelay(QSS::Configuration &configuration) {
+TcpRelay::TcpRelay(Configuration &configuration) {
   m_local = std::make_unique<QTcpServer>();
   m_config = configuration;
 }

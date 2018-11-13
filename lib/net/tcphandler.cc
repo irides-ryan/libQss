@@ -13,7 +13,7 @@ const char TcpHandler::HANDLE_ACCEPT[] = { 5, 0 };
 const char TcpHandler::HANDLE_REJECT[] = { 0, 91 };
 const char TcpHandler::HANDLE_RESPONSE[] = { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
 
-TcpHandler::TcpHandler(QTcpSocket *socket, QSS::Configuration &configuration) {
+TcpHandler::TcpHandler(QTcpSocket *socket, Configuration &configuration) {
   m_local.reset(socket);
   m_config = &configuration;
   m_wannaWrite.clear();
@@ -177,13 +177,13 @@ void TcpHandler::createRemote(QSS::Address &destination) {
   m_encryptor = std::make_unique<QSS::Encryptor>(method, passwd);
 }
 
-void TcpHandler::loadProxyRemote(QSS::Proxy &proxy) {
+void TcpHandler::loadProxyRemote(Proxy &proxy) {
   if (proxy.use) {
     QNetworkProxy p;
     QNetworkProxy::ProxyType type;
-    if (proxy.type == QSS::Proxy::HTTP) {
+    if (proxy.type == Proxy::HTTP) {
       type = QNetworkProxy::HttpProxy;
-    } else if (proxy.type == QSS::Proxy::SOCKS5) {
+    } else if (proxy.type == Proxy::SOCKS5) {
       type = QNetworkProxy::Socks5Proxy;
     } else {
       // unknown type, do not set

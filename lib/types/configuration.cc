@@ -1,6 +1,6 @@
 #include "configuration.h"
 
-namespace QSS {
+namespace QSX {
 
 Configuration::Configuration()
         : m_shareOverLan(false) {}

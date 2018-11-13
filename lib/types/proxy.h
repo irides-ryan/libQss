@@ -2,7 +2,7 @@
 
 #include <QtCore/QString>
 
-namespace QSS {
+namespace QSX {
 
 class Proxy {
 

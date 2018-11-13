@@ -9,14 +9,14 @@ namespace QSX {
 
 class TcpRelay : public QObject {
 
-  Q_OBJECT
+Q_OBJECT
 
-  QSS::Configuration m_config;
+  Configuration m_config;
   std::unique_ptr<QTcpServer> m_local;
   std::list<TcpHandler *> m_cache;
 
 public:
-  explicit TcpRelay(QSS::Configuration &configuration);
+  explicit TcpRelay(Configuration &configuration);
   ~TcpRelay() override;
 
   bool listen();

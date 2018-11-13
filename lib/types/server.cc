@@ -1,6 +1,6 @@
 #include "server.h"
 
-namespace QSS {
+namespace QSX {
 
 Server::Server()
         : server(""),

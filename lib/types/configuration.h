@@ -7,7 +7,9 @@
 #include "proxy.h"
 #include "address.h"
 
-namespace QSS {
+namespace QSX {
+
+using QSS::Address;
 
 class IChooser {
 public:
