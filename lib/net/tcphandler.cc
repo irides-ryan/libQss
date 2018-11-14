@@ -5,7 +5,7 @@
 #include <QtNetwork/QNetworkProxy>
 #include "tcphandler.h"
 
-#define dout (qDebug() << "[" << this << "]")
+#define dout (qDebug() << "[" << this << __func__ << "]")
 
 namespace QSX {
 
@@ -243,6 +243,10 @@ void TcpHandler::onRecvLocal() {
 
 void TcpHandler::onRecvRemote() {
   auto recv = m_remote->readAll();
+  if (recv.isEmpty()) {
+    dout << "no data or maybe error occurred.";
+    return;
+  }
   m_countRead += recv.size();
   emit bytesRead((uint64_t)recv.size());
   auto dec = m_encryptor->decrypt((const uint8_t *)recv.data(), (size_t)recv.size());
