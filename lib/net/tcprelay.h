@@ -25,7 +25,10 @@ public:
 protected:
 
 protected slots:
-  void accepted();
+  void onAccepted();
+
+signals:
+  void accept(TcpHandler *handler);
 
 };
 

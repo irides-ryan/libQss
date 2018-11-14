@@ -13,7 +13,7 @@ TcpRelay::~TcpRelay() {
 
 bool TcpRelay::listen() {
 
-  QObject::connect(m_local.get(), &QTcpServer::newConnection, this, &TcpRelay::accepted);
+  QObject::connect(m_local.get(), &QTcpServer::newConnection, this, &TcpRelay::onAccepted);
 
   auto localAddress = m_config.getLocalAddress();
   auto localPort = m_config.getLocalPort();
@@ -38,7 +38,7 @@ void TcpRelay::close() {
   m_cache.clear();
 }
 
-void TcpRelay::accepted() {
+void TcpRelay::onAccepted() {
   auto client = m_local->nextPendingConnection();
 
   qDebug() << "TcpReply accept a connection:" << client->peerAddress().toString() << ":" << client->peerPort();
@@ -56,6 +56,7 @@ void TcpRelay::accepted() {
     qDebug() << "[" << handler << "]" << "w += " << s << "\t\tW:" << handler->getCountWrite();
   });
   m_cache.emplace_back(handler);
+  emit accept(handler);
 }
 
 }
