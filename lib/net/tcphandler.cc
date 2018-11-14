@@ -113,10 +113,12 @@ void TcpHandler::handle(QByteArray &data) {
       dout << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
 
       // reply to client
+      // TODO what if reply when server connected?
       m_local->write(HANDLE_RESPONSE, sizeof(HANDLE_RESPONSE));
 
       createRemote(destination);
       m_state = CONNECTING;
+      emit connecting(destination);
 
       Q_ASSERT(data.size() != 0);
 
@@ -250,6 +252,7 @@ void TcpHandler::onRecvRemote() {
 void TcpHandler::onConnectedRemote() {
   static QByteArray none;
   m_state = STREAM;
+  emit connected();
   handle(none);
 }
 

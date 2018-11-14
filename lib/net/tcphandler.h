@@ -79,6 +79,8 @@ protected slots:
   void onErrorRemote();
 
 signals:
+  void connecting(QSS::Address &destination);
+  void connected();
   void bytesRead(uint64_t s);
   void bytesWrite(uint64_t s);
   void finished(int r);
