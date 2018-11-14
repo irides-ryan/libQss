@@ -35,7 +35,6 @@ void TcpRelay::close() {
   for (auto handler : m_cache) {
     handler->deleteLater();
   }
-  m_cache.clear();
 }
 
 void TcpRelay::onAccepted() {

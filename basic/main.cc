@@ -3,14 +3,18 @@
 #include <signal.h>
 #include "../lib/util/listener.h"
 
+using namespace QSX;
+
+Listener *listener = nullptr;
+
 void signal_handler(int signal) {
-  if (signal == SIGINT || signal == SIGTERM) {
-    qDebug() << "SIGNAL: " << signal;
+  if (signal == SIGINT || signal == SIGTERM || signal == SIGABRT) {
+    qDebug() << "\nSIGNAL: " << signal;
+    listener->stop();
+    listener->deleteLater();
     qApp->quit();
   }
 }
-
-using namespace QSX;
 
 int main(int argc, char **argv) {
 
@@ -39,8 +43,8 @@ int main(int argc, char **argv) {
 
   configuration.setLocalPort(1080);
 
-  Listener listener;
-  listener.start(configuration);
+  listener = new Listener();
+  listener->start(configuration);
 
   QCoreApplication::exec();
 

@@ -7,7 +7,10 @@
 
 namespace QSX {
 
-class Listener {
+class Listener : public QObject {
+
+Q_OBJECT
+
 private:
   // tcp_reply
   std::unique_ptr<TcpRelay> m_tcpReply = nullptr;
@@ -21,9 +24,7 @@ public:
   ~Listener();
 
   bool start(Configuration &config);
-
   void stop();
-
 };
 
 }
