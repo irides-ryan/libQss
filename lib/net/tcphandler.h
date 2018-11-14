@@ -12,7 +12,19 @@ class TcpHandler : public QObject {
 Q_OBJECT
 
   enum STATE {
-    INIT, ADDRESS, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED
+    INIT,                 /* handshake */
+    ADDRESS,              /* handle the destination address */
+    UDP_ASSOC,            /* handle the udp associate */
+    DNS,                  /* look up the ss server address, not used for Qt */
+    CONNECTING,           /* connect to ss server */
+    STREAM,               /* ss server connected, start data streaming */
+    DESTROYED             /* end of this handler */
+  };
+
+  enum CMD {
+    CONNECT = 1,
+    // BIND = 2,          /* command BIND not used */
+    UDP_ASSOCIATE = 3
   };
 
   enum ERRCODE {

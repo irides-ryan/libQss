@@ -102,9 +102,7 @@ void TcpHandler::handle(QByteArray &data) {
     }
     char cmd = data[1];
     switch (cmd) {
-      // TODO use enum or definition
-    case 0x01: {
-      // CONNECT
+    case CONNECT: {
       data = data.remove(0, 3);
       QSS::Address destination;
       if (!readHeader(data, destination)) {
@@ -126,8 +124,7 @@ void TcpHandler::handle(QByteArray &data) {
       return;
     }
 
-    case 0x03:
-      // UDP ASSOCIATE
+    case UDP_ASSOCIATE:
       Q_ASSERT(false);
 
     default:
