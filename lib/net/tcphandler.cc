@@ -22,6 +22,8 @@ TcpHandler::TcpHandler(QTcpSocket *socket, Configuration &configuration) {
 
   QObject::connect(m_local.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvLocal);
   QObject::connect(m_local.get(), Overload::of(&QTcpSocket::error), this, &TcpHandler::onErrorLocal);
+
+  updateActive();
 }
 
 TcpHandler::~TcpHandler() {
@@ -42,6 +44,10 @@ void TcpHandler::close(int r) {
   }
   m_state = DESTROYED;
   emit finished(r);
+}
+
+void TcpHandler::updateActive() {
+  m_active = QTime::currentTime();
 }
 
 /**
@@ -162,6 +168,7 @@ void TcpHandler::createRemote(QSS::Address &destination) {
   auto method = remote.method.toStdString();
   auto passwd = remote.passwd.toStdString();
   m_encryptor = std::make_unique<QSS::Encryptor>(method, passwd);
+  setTimeout(remote.timeout);
 }
 
 void TcpHandler::loadProxyRemote(Proxy &proxy) {
@@ -232,6 +239,7 @@ bool TcpHandler::readHeader(QByteArray &data, Address &destination) {
 }
 
 void TcpHandler::onRecvLocal() {
+  updateActive();
   auto data = m_local->readAll();
   if (data.isEmpty()) {
     dout << "no data or maybe error occurred.";
@@ -242,6 +250,7 @@ void TcpHandler::onRecvLocal() {
 }
 
 void TcpHandler::onRecvRemote() {
+  updateActive();
   auto recv = m_remote->readAll();
   if (recv.isEmpty()) {
     dout << "no data or maybe error occurred.";
@@ -255,6 +264,7 @@ void TcpHandler::onRecvRemote() {
 
 void TcpHandler::onConnectedRemote() {
   static QByteArray none;
+  updateActive();
   m_state = STREAM;
   emit connected();
   handle(none);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <QtCore/QTime>
 #include <QtNetwork/QTcpSocket>
 #include <crypto/encryptor.h>
 #include <types/configuration.h>
@@ -41,10 +42,16 @@ Q_OBJECT
   };
 
   static const char HANDLE_ACCEPT[], HANDLE_REJECT[], HANDLE_RESPONSE[];
+  static const uint64_t TIMEOUT_MIN = 60;
 
-  std::unique_ptr<QTcpSocket> m_local, m_remote;
   Configuration *m_config = nullptr;
-  std::unique_ptr<QSS::Encryptor> m_encryptor = nullptr;
+  std::unique_ptr<QTcpSocket> m_local, m_remote;
+  std::unique_ptr<QSS::Encryptor> m_encryptor;
+  STATE m_state = INIT;
+  QByteArray m_wannaWrite;
+  uint64_t m_countRead = 0, m_countWrite = 0;
+  uint64_t m_timeout = TIMEOUT_MIN;       /* don't less than TIMEOUT_MIN */
+  QTime m_active;
 
 public:
   TcpHandler(QTcpSocket *socket, Configuration &configuration);
@@ -60,11 +67,16 @@ public:
     return m_countWrite;
   }
 
-private:
-  STATE m_state = INIT;
-  uint64_t m_countRead = 0, m_countWrite = 0;
-  QByteArray m_wannaWrite;
+  bool isTimeout() {
+    return m_active.elapsed() > m_timeout;
+  }
 
+private:
+  void setTimeout(uint64_t timeout) {
+    m_timeout = timeout > TIMEOUT_MIN ? timeout : TIMEOUT_MIN;
+  }
+
+  void updateActive();
   void handle(QByteArray &data);
   void createRemote(QSS::Address &destination);
   void loadProxyRemote(Proxy &proxy);
