@@ -48,12 +48,16 @@ void TcpRelay::onAccepted() {
     handler->deleteLater();
     qDebug() << "removed, left" << m_cache.size();
   });
+
+#ifdef QT_DEBUG
   QObject::connect(handler, &TcpHandler::bytesRead, [=](uint64_t s) {
     qDebug() << "[" << handler << "]" << "r += " << s << "\t\tR:" << handler->getCountRead();
   });
   QObject::connect(handler, &TcpHandler::bytesWrite, [=](uint64_t s) {
     qDebug() << "[" << handler << "]" << "w += " << s << "\t\tW:" << handler->getCountWrite();
   });
+#endif
+
   m_cache.emplace_back(handler);
   emit accept(handler);
 

@@ -20,6 +20,7 @@ bool Listener::start(Configuration &config) {
     m_tcpReply->close();
     return false;
   }
+  QObject::connect(m_tcpReply.get(), &TcpRelay::accept, this, &Listener::onAccepted);
 
   m_udpReply = std::make_unique<QUdpSocket>();
   ret = m_udpReply->bind();
@@ -39,6 +40,10 @@ void Listener::stop() {
   if (m_udpReply) {
     m_udpReply->close();
   }
+}
+
+void Listener::onAccepted(TcpHandler *handler) {
+  emit accept(handler);
 }
 
 }

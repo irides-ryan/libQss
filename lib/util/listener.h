@@ -21,10 +21,16 @@ private:
 
 public:
   Listener();
-  ~Listener();
+  ~Listener() override;
 
   bool start(Configuration &config);
   void stop();
+
+protected slots:
+  void onAccepted(TcpHandler *handler);
+
+signals:
+  void accept(TcpHandler *handler);
 };
 
 }
