@@ -56,6 +56,13 @@ void TcpRelay::onAccepted() {
   });
   m_cache.emplace_back(handler);
   emit accept(handler);
+
+  // close the timed out handlers
+  for (auto h : m_cache) {
+    if (h->isTimeout()) {
+      h->close();
+    }
+  }
 }
 
 }
