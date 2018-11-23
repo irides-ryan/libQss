@@ -30,6 +30,14 @@ public:
     timeout = proxy.timeout;
     return *this;
   }
+
+  bool operator==(Proxy const &r) {
+    return use == r.use
+           && type == r.type
+           && server == r.server
+           && port == r.port
+           && timeout == r.timeout;
+  }
 };
 
 }

@@ -24,6 +24,17 @@ public:
 
   Server &operator=(Server const &s) = default;
 
+  bool operator==(Server const &r) {
+    return server == r.server
+           && local == r.local
+           && passwd == r.passwd
+           && method == r.method
+           && remarks == r.remarks
+           && server_port == r.server_port
+           && local_port == r.local_port
+           && timeout == r.timeout;
+  }
+
   static Server getDefault() {
     return Server();
   }
