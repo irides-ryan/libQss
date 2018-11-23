@@ -42,7 +42,7 @@ Q_OBJECT
   };
 
   static const char HANDLE_ACCEPT[], HANDLE_REJECT[], HANDLE_RESPONSE[];
-  static const uint64_t TIMEOUT_MIN = 60;
+  static const uint64_t TIMEOUT_MIN = 60 * 1000;
 
   Configuration *m_config = nullptr;
   std::unique_ptr<QTcpSocket> m_local, m_remote;
@@ -73,7 +73,7 @@ public:
 
 private:
   void setTimeout(uint64_t timeout) {
-    m_timeout = timeout > TIMEOUT_MIN ? timeout : TIMEOUT_MIN;
+    m_timeout = timeout > TIMEOUT_MIN ? timeout * 1000 : TIMEOUT_MIN;
   }
 
   void updateActive();

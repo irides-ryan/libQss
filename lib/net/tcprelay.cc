@@ -64,7 +64,7 @@ void TcpRelay::onAccepted() {
   // close the timed out handlers
   for (auto h : m_cache) {
     if (h->isTimeout()) {
-      h->close();
+      h->deleteLater();
     }
   }
 }
