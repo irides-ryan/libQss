@@ -32,8 +32,10 @@ bool TcpRelay::listen() {
 }
 
 void TcpRelay::close() {
-  for (auto handler : m_cache) {
-    handler->deleteLater();
+  for (auto i = m_cache.begin(); i != m_cache.end();) {
+    qDebug() << "closing" << *i << "size:" << m_cache.size();
+    auto h = i++;
+    (*h)->close();
   }
 }
 
@@ -62,9 +64,10 @@ void TcpRelay::onAccepted() {
   emit accept(handler);
 
   // close the timed out handlers
-  for (auto h : m_cache) {
-    if (h->isTimeout()) {
-      h->deleteLater();
+  for (auto i = m_cache.begin(); i != m_cache.end();) {
+    auto h = i++;
+    if ((*h)->isTimeout()) {
+      (*h)->close();
     }
   }
 }
