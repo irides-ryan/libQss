@@ -116,7 +116,6 @@ void TcpHandler::handle(QByteArray &data) {
         close(E_READ_HEADER);
         return;
       }
-      dout << "connecting to" << destination.getAddress().data() << ":" << destination.getPort();
 
       // reply to client
       // TODO what if reply when server connected?
@@ -153,7 +152,6 @@ void TcpHandler::handle(QByteArray &data) {
 void TcpHandler::createRemote(QSS::Address &destination) {
   // choose a server
   auto remote = m_config->getServer(destination);
-  dout << "createRemote: server:" << remote.server << ":" << remote.server_port << "," << remote.method;
 
   // init the server and encryptor
   m_remote = std::make_unique<QTcpSocket>();
