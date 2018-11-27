@@ -51,7 +51,7 @@ Q_OBJECT
   QByteArray m_wannaWrite;
   uint64_t m_countRead = 0, m_countWrite = 0;
   uint64_t m_timeout = TIMEOUT_MIN;       /* don't less than TIMEOUT_MIN */
-  QTime m_active;
+  QTime m_active, m_latency;
 
 public:
   TcpHandler(QTcpSocket *socket, Configuration &configuration);
@@ -92,7 +92,7 @@ protected slots:
 
 signals:
   void connecting(QSS::Address &destination);
-  void connected();
+  void connected(int latency);
   void bytesRead(uint64_t s);
   void bytesWrite(uint64_t s);
   void finished(int r);

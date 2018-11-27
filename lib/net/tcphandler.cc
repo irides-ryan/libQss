@@ -162,6 +162,7 @@ void TcpHandler::createRemote(QSS::Address &destination) {
 
   loadProxyRemote(m_config->getProxy());
   m_remote->connectToHost(remote.server, remote.server_port);
+  m_latency = QTime::currentTime();
 
   auto method = remote.method.toStdString();
   auto passwd = remote.passwd.toStdString();
@@ -262,9 +263,10 @@ void TcpHandler::onRecvRemote() {
 
 void TcpHandler::onConnectedRemote() {
   static QByteArray none;
+  int latency = m_latency.elapsed();
   updateActive();
   m_state = STREAM;
-  emit connected();
+  emit connected(latency);
   handle(none);
 }
 
