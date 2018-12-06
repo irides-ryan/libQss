@@ -14,7 +14,7 @@ using QSS::Address;
 class IChooser {
 public:
   virtual ~IChooser() = default;
-  virtual Server getServer(Address &destination) = 0;
+  virtual Server getServer(Address &destination, int index) = 0;
 };
 
 class Configuration {
@@ -24,12 +24,13 @@ protected:
   IChooser *m_chooser = nullptr;
   bool m_shareOverLan;
   uint16_t m_localPort;
+  int m_index;
 
 public:
   Configuration();
   ~Configuration();
 
-  Server getServer(Address &destination, int index = -1);
+  Server getServer(Address &destination);
 
   void setServers(QList<Server> &servers) {
     m_servers = servers;

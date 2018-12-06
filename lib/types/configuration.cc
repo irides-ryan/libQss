@@ -3,24 +3,26 @@
 namespace QSX {
 
 Configuration::Configuration()
-        : m_shareOverLan(false) {}
+  : m_shareOverLan(false), m_localPort(1080), m_index(0) {}
 
 Configuration::~Configuration() {
   unregisterChooser();
 }
 
-Server Configuration::getServer(Address &destination, int index) {
-  if (index < 0 && m_chooser) {
-    return m_chooser->getServer(destination);
+Server Configuration::getServer(Address &destination) {
+  if (m_chooser) {
+    return m_chooser->getServer(destination, m_index);
   }
+
   if (m_servers.empty()) {
     return Server();
-  } else {
-    if (!(0 < index && index < m_servers.size())) {
-      index = 0;
-    }
-    return m_servers[index];
   }
+
+  int index = m_index;
+  if (!(0 <= index && index < m_servers.size())) {
+    index = 0;
+  }
+  return m_servers[index];
 }
 
 }
