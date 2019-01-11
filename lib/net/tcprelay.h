@@ -12,11 +12,11 @@ class TcpRelay : public QObject {
 Q_OBJECT
 
   Configuration m_config;
-  std::unique_ptr<QTcpServer> m_local;
+  QTcpServer *m_local = nullptr;
   std::list<TcpHandler *> m_cache;
 
 public:
-  explicit TcpRelay(Configuration &configuration);
+  explicit TcpRelay(Configuration &configuration, QObject *parent);
   ~TcpRelay() override;
 
   bool listen();

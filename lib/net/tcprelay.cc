@@ -2,18 +2,20 @@
 
 namespace QSX {
 
-TcpRelay::TcpRelay(Configuration &configuration) {
-  m_local = std::make_unique<QTcpServer>();
+TcpRelay::TcpRelay(Configuration &configuration, QObject *parent) : QObject(parent) {
+  m_local = new QTcpServer(this);
   m_config = configuration;
 }
 
 TcpRelay::~TcpRelay() {
   close();
+  if (m_local) {
+    m_local->deleteLater();
+  }
 }
 
 bool TcpRelay::listen() {
-
-  QObject::connect(m_local.get(), &QTcpServer::newConnection, this, &TcpRelay::onAccepted);
+  QObject::connect(m_local, &QTcpServer::newConnection, this, &TcpRelay::onAccepted);
 
   auto localAddress = m_config.getLocalAddress();
   auto localPort = m_config.getLocalPort();
@@ -41,7 +43,7 @@ void TcpRelay::close() {
 void TcpRelay::onAccepted() {
   auto client = m_local->nextPendingConnection();
 
-  auto handler = new TcpHandler(client, m_config);
+  auto handler = new TcpHandler(client, m_config, this);
   QObject::connect(handler, &TcpHandler::finished, [=](int r) {
     m_cache.remove(handler);
     handler->deleteLater();

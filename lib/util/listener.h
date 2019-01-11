@@ -13,14 +13,14 @@ Q_OBJECT
 
 private:
   // tcp_reply
-  std::unique_ptr<TcpRelay> m_tcpReply = nullptr;
+  TcpRelay *m_tcpReply = nullptr;
   // udp_reply
-  std::unique_ptr<QUdpSocket> m_udpReply = nullptr;
+  QUdpSocket *m_udpReply = nullptr;
 
   Configuration config;
 
 public:
-  Listener();
+  explicit Listener(QObject *parent);
   ~Listener() override;
 
   bool start(Configuration &config);

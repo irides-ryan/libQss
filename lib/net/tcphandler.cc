@@ -15,13 +15,14 @@ const char TcpHandler::HANDLE_ACCEPT[] = { 5, 0 };
 const char TcpHandler::HANDLE_REJECT[] = { 0, 91 };
 const char TcpHandler::HANDLE_RESPONSE[] = { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
 
-TcpHandler::TcpHandler(QTcpSocket *socket, Configuration &configuration) {
-  m_local.reset(socket);
+TcpHandler::TcpHandler(QTcpSocket *socket, Configuration &configuration, QObject *parent) : QObject(parent) {
+  m_local = socket;
+  m_local->setParent(this);
   m_config = &configuration;
   m_wannaWrite.clear();
 
-  QObject::connect(m_local.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvLocal);
-  QObject::connect(m_local.get(), Overload::of(&QTcpSocket::error), this, &TcpHandler::onErrorLocal);
+  QObject::connect(m_local, &QTcpSocket::readyRead, this, &TcpHandler::onRecvLocal);
+  QObject::connect(m_local, Overload::of(&QTcpSocket::error), this, &TcpHandler::onErrorLocal);
 
   updateActive();
 }
@@ -35,9 +36,11 @@ TcpHandler::~TcpHandler() {
 void TcpHandler::close(int r) {
   if (m_local) {
     m_local->close();
+    m_local->deleteLater();
   }
   if (m_remote) {
     m_remote->close();
+    m_remote->deleteLater();
   }
   if (m_encryptor) {
     m_encryptor.reset();
@@ -154,11 +157,11 @@ void TcpHandler::createRemote(QSS::Address &destination) {
   auto remote = m_config->getServer(destination);
 
   // init the server and encryptor
-  m_remote = std::make_unique<QTcpSocket>();
+  m_remote = new QTcpSocket(this);
 
-  QObject::connect(m_remote.get(), &QTcpSocket::readyRead, this, &TcpHandler::onRecvRemote);
-  QObject::connect(m_remote.get(), Overload::of(&QTcpSocket::error), this, &TcpHandler::onErrorRemote);
-  QObject::connect(m_remote.get(), &QTcpSocket::connected, this, &TcpHandler::onConnectedRemote);
+  QObject::connect(m_remote, &QTcpSocket::readyRead, this, &TcpHandler::onRecvRemote);
+  QObject::connect(m_remote, Overload::of(&QTcpSocket::error), this, &TcpHandler::onErrorRemote);
+  QObject::connect(m_remote, &QTcpSocket::connected, this, &TcpHandler::onConnectedRemote);
 
   loadProxyRemote(m_config->getProxy());
   m_remote->connectToHost(remote.server, remote.server_port);

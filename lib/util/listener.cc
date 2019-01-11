@@ -2,27 +2,26 @@
 
 namespace QSX {
 
-Listener::Listener() {
+Listener::Listener(QObject *parent) : QObject(parent) {
 
 }
 
 Listener::~Listener() {
-  m_tcpReply.reset();
-  m_udpReply.reset();
+  stop();
 }
 
 bool Listener::start(Configuration &config) {
   bool ret;
-  m_tcpReply = std::make_unique<QSX::TcpRelay>(config);
+  m_tcpReply = new QSX::TcpRelay(config, this);
   ret = m_tcpReply->listen();
   if (!ret) {
     // show error message
     m_tcpReply->close();
     return false;
   }
-  QObject::connect(m_tcpReply.get(), &TcpRelay::accept, this, &Listener::onAccepted);
+  QObject::connect(m_tcpReply, &TcpRelay::accept, this, &Listener::onAccepted);
 
-  m_udpReply = std::make_unique<QUdpSocket>();
+  m_udpReply = new QUdpSocket(this);
   ret = m_udpReply->bind();
   if (!ret) {
     // show error message
@@ -36,9 +35,13 @@ bool Listener::start(Configuration &config) {
 void Listener::stop() {
   if (m_tcpReply) {
     m_tcpReply->close();
+    m_tcpReply->deleteLater();
+    m_tcpReply = nullptr;
   }
   if (m_udpReply) {
     m_udpReply->close();
+    m_udpReply->deleteLater();
+    m_udpReply = nullptr;
   }
 }
 

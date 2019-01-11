@@ -45,7 +45,7 @@ Q_OBJECT
   static const uint64_t TIMEOUT_MIN = 60 * 1000;
 
   Configuration *m_config = nullptr;
-  std::unique_ptr<QTcpSocket> m_local, m_remote;
+  QTcpSocket *m_local = nullptr, *m_remote = nullptr;
   std::unique_ptr<QSS::Encryptor> m_encryptor;
   STATE m_state = INIT;
   QByteArray m_wannaWrite;
@@ -54,7 +54,7 @@ Q_OBJECT
   QTime m_active, m_latency;
 
 public:
-  TcpHandler(QTcpSocket *socket, Configuration &configuration);
+  TcpHandler(QTcpSocket *socket, Configuration &configuration, QObject *parent);
   ~TcpHandler() override;
 
   void close(int r = 0);
