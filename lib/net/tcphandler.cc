@@ -289,6 +289,10 @@ void TcpHandler::onErrorRemote() {
     close(E_CLOSE_REMOTE);
   } else if (m_remote->error() == QAbstractSocket::SocketTimeoutError) {
     close(E_TIMEOUT_REMOTE);
+
+    // TODO handle more proxy errors
+  } else if (m_remote->error() == QAbstractSocket::ProxyConnectionClosedError) {
+    close(E_PROXY_CLOSED);
   } else {
     dout << "TcpHandler: remote: " << m_remote->errorString();
     close(E_OTHER_REMOTE);

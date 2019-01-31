@@ -38,7 +38,10 @@ Q_OBJECT
     E_TIMEOUT_REMOTE,     /* 6 timeout when connecting to remote */
     E_TIMEOUT_LOCAL,      /* 7 timeout when connecting to local */
     E_OTHER_REMOTE,       /* 8 other error occurred on remote socket */
-    E_OTHER_LOCAL         /* 9 other error occurred on local socket */
+    E_OTHER_LOCAL,        /* 9 other error occurred on local socket */
+
+    // TODO more proxy errors
+    E_PROXY_CLOSED,       /*10 forward proxy closed */
   };
 
   static const char HANDLE_ACCEPT[], HANDLE_REJECT[], HANDLE_RESPONSE[];
