@@ -10,7 +10,9 @@ TcpRelay::TcpRelay(Configuration &configuration, QObject *parent) : QObject(pare
 TcpRelay::~TcpRelay() {
   close();
   if (m_local) {
+    m_local->close();
     m_local->deleteLater();
+    m_local = nullptr;
   }
 }
 
@@ -37,6 +39,9 @@ void TcpRelay::close() {
   for (auto i = m_cache.begin(); i != m_cache.end();) {
     auto h = i++;
     (*h)->close();
+  }
+  if (m_local) {
+    m_local->close();
   }
 }
 
